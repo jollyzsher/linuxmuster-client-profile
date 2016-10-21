@@ -1,8 +1,5 @@
 # this file is sourced from /usr/sbin/linuxmuster-pam-mount
 
-# this script is supposed to be run only once after mount of HOME_auf_Server
-[ -z "$HOMEDIRMOUNT" ] && return 0
-
 # source config file
 . /etc/linuxmuster-client/profile/profile.conf || exit 1
 # source profile functions
@@ -12,5 +9,7 @@
 $LOGGING && msg2log pre-mount "Entering 020-chmod-user $1 $2"
 $LOGGING && msg2log pre-mount "Environment settings are: USER=$USER VOLUME=$VOLUME MNPT=$MNTPT OPTIONS=$OPTIONS SERVER=$SERVER NUMUID=$NUMUID NUMPRIGID=$NUMPRIGID FULLNAME=$FULLNAME HOMEDIR=$HOMEDIR LOGINSHELL=$LOGINSHELL"
 
+# this script is supposed to be run only once after mount of HOME_auf_Server
+[ -z "$HOMEDIRMOUNT" ] && return 0
 
 chown -R $USER $HOMEDIR
