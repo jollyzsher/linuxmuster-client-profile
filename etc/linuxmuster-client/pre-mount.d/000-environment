@@ -26,8 +26,8 @@ $LOGGING && msg2log pre-mount "Entering 000-environment $1 $2"
 get_environment "$1" "$2" "$3" "$4" "$5"
 
 LMLSERVERIP=$(grep "^uri\ ldap://" /etc/ldap.conf | head -n 1 | sed "s@^uri\ ldap://@@;s@/.*@@")
-SERVERIP=$(gethostip $SERVER 2>/dev/null | awk '{print $2}')
-if [ $USER = $VOLUME -a "$LMLSERVERIP" = "$SERVERIP" ]; then
+REQSERVERIP=$(gethostip $SERVER 2>/dev/null | awk '{print $2}')
+if [ $USER = $VOLUME -a "$LMLSERVERIP" = "$REQSERVERIP" ]; then
     HOMEDIRMOUNT="true"
 else
     HOMEDIRMOUNT=""
