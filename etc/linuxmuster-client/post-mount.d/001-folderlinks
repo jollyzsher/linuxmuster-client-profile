@@ -4,11 +4,8 @@
 $LOGGING && msg2log post-mount "Entering 001-folderlinks $1 $2"
 $LOGGING && msg2log post-mount "Environmenti settings are: USER=$USER VOLUME=$VOLUME MNPT=$MNTPT OPTIONS=$OPTIONS SERVER=$SERVER NUMUID=$NUMUID NUMPRIGID=$NUMPRIGID FULLNAME=$FULLNAME HOMEDIR=$HOMEDIR LOGINSHELL=$LOGINSHELL"
 
-# this script gets executed only once, after the users home from the
-# server gets mounted. in this case $USER and $VOLUME are the same
-if [ $USER != $VOLUME ]; then
-    return 0
-fi
+# this script is supposed to be run only once after mount of HOME_auf_Server
+[ -z "$HOMEDIRMOUNT" ] && return 0
 
 # Einrichtung dieser Verzeichnisse ab-/anschaltbar machen
 # einzelne Elemente in Konfigurationsdatei eintragen
