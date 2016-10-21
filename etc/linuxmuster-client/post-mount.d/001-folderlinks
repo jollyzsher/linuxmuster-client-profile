@@ -10,9 +10,6 @@ if [ $USER != $VOLUME ]; then
     return 0
 fi
 
-# log success
-$LOGGING && msg2log post-mount "We mounted the users home, copy default profile"
-
 # Einrichtung dieser Verzeichnisse ab-/anschaltbar machen
 # einzelne Elemente in Konfigurationsdatei eintragen
 #for i in Bilder Dokumente Musik Downloads Videos; do
