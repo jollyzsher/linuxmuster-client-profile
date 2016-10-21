@@ -37,7 +37,7 @@ fi
 #  oder "libreoffice:.config/libreoffice").
 
 # Konfiguration einlesen für                                                                                                         
-# Basics zu linuxmuster-clients                                                                                                      
+# Basics zu linuxmuster-clients  (hard dependency on linuxmuster-client-shares!)
 . /etc/linuxmuster-client/linuxmuster-client.conf || exit 1
 # Verzeichnis für Einstellungen im Heimatverzeichnis auf dem Server                                                                  
 . /etc/linuxmuster-client/profile/home-preference.conf || exit 1                                                                     
@@ -53,16 +53,8 @@ SERVEREINSTELLUNGEN=`echo $HOMEFOLDERNAME/$HOMEPREFERENCEFOLDERNAME`
 # daher auskommentiert
 #HOMEDIR="`pwd`"
  
-# this script should only get executed once, before the users home from the
-# server gets mounted. In this case $USER and $VOLUME are the same.
-# $USER and $VOLUME can also be the same, when mounting $VOLUME from a different server,
-# thus return if $USER and $VOLUME are different or if the serverip is different from the serverip of the main server
-requestserverip=$(gethostip $SERVER | awk '{print $2}')
-lmlserverip=$(grep "^uri\ ldap://" /etc/ldap.conf | head -n 1 | sed "s@^uri\ ldap://@@;s@/.*@@")
-if [ $USER != $VOLUME -o $lmlserverip != $requestserverip ]; then
-   msg2log pre-mount "LML: $lmlserverip, Request: $requestserverip"
-   return 0
-fi
+# this script is supposed to be run only once after mount of HOME_auf_Server
+[ -z "$HOMEDIRMOUNT" ] && return 0
 
 # Ist das Verzeichnis $SERVEREINSTELLUNGEN nicht vorhanden, 
 # wird es angelegt
@@ -82,7 +74,7 @@ IFS=$'\012'
 
 for ZWANG in $ZWANGSLINKS; do
  
- SERVER=`echo $ZWANG | cut -d ":" -f 1`
+ REMOTE=`echo $ZWANG | cut -d ":" -f 1`
  
  LOKAL=`echo $ZWANG | cut -d ":" -f 2`
  
@@ -93,12 +85,12 @@ for ZWANG in $ZWANGSLINKS; do
 
  # Konfigurationsverzeichnisse
 
- if [ -d `echo $HOMEDIR/$SERVEREINSTELLUNGEN/$SERVER` ]
+ if [ -d `echo $HOMEDIR/$SERVEREINSTELLUNGEN/$REMOTE` ]
  then
   cd $HOMEDIR
  else
   
-  if [ -f `echo $HOMEDIR/$SERVEREINSTELLUNGEN/$SERVER` ]
+  if [ -f `echo $HOMEDIR/$SERVEREINSTELLUNGEN/$REMOTE` ]
   then 
    cd $HOMEDIR
   else
@@ -106,18 +98,18 @@ for ZWANG in $ZWANGSLINKS; do
    if [ -d `echo $HOMEDIR/$LOKAL` ]
    then
     
-    cp -a $HOMEDIR/$LOKAL $HOMEDIR/$SERVEREINSTELLUNGEN/$SERVER
+    cp -a $HOMEDIR/$LOKAL $HOMEDIR/$SERVEREINSTELLUNGEN/$REMOTE
     
    else
     
     if [ -f `echo $HOMEDIR/$LOKAL` ]
     then 
      
-     cp $HOMEDIR/$LOKAL $HOMEDIR/$SERVEREINSTELLUNGEN/$SERVER
+     cp $HOMEDIR/$LOKAL $HOMEDIR/$SERVEREINSTELLUNGEN/$REMOTE
      
     else
      
-     touch $HOMEDIR/$SERVEREINSTELLUNGEN/$SERVER-kann-nicht-erzeugt-werden
+     touch $HOMEDIR/$SERVEREINSTELLUNGEN/$REMOTE-kann-nicht-erzeugt-werden
      # Hinweis:
      # Ohne Standard kann kein Konfiguration erzeugt werden,
      # da nicht bekannt ist, ob es eine Datei oder ein Verzeichnis sein muss.
